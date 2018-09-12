@@ -3,7 +3,6 @@ import web3
 
 from web3 import Web3
 from solc import compile_source
-from web3.contract import ConciseContract
 
 def compile_source_file(file_path):
    with open(file_path, 'r') as f:
@@ -46,24 +45,23 @@ print()
 print()
 
 # localhost: ganache client and specify intkey contract
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-compiled_sol = compile_source_file('./contracts/intkey.sol')
+# w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+w3 = Web3(Web3.HTTPProvider("https://api-dev.veriteos.com/v1/rpc", request_kwargs={'auth': ('veriteos_demo_key_0','')}))
+compiled_sol = compile_source_file('intkey.sol')
 
-# Use the first test account in the ganache client
+# Use the first test account 
 w3.eth.defaultAccount = w3.eth.accounts[0]
 
 #separate KV pair of id and interface
 contract_id, contract_interface = compiled_sol.popitem()
 
 # deploy contract to w3 
-contract_address = deploy_contract(w3, contract_interface)
+# contract_address = deploy_contract(w3, contract_interface
+contract_address = w3.toChecksumAddress("0x8558eb5eeb9ea968cf6e8e6f264d488c202b5c94")
 print("Deployed contract {0} to address: {1}\n".format(contract_id, contract_address))
 
 # instantiate the deployed contract
 intkey = w3.eth.contract(address=contract_address, abi= contract_interface['abi'],)
-
-# concise = ConciseContract(intkey) # optional concise contract format
-# print("Intkey in concise format",concise.get(0))
 
 key = 1
 
